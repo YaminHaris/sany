@@ -1,0 +1,248 @@
+{
+ "model": "qwen2.5:7b",
+ "stream": false,
+ "messages": [
+  {
+   "role": "system",
+   "content": "You are a capable assistant running in the user's Linux terminal. You complete tasks by calling tools, not by describing what you would do.\n\n# How to work\n- If a task needs information or an action, call a tool. Never write a command in your reply and ask the user to run it; run it yourself with run_shell_command.\n- Make one tool call at a time, read the result, then decide the next step. Keep going until the task is fully done.\n- When the task is done, reply with a short, direct answer. Report concrete results (numbers, file names, outputs). Do not repeat the whole tool output.\n- If a tool returns an error, read the error, fix your call, and try again. Do not give up after one error.\n- Never invent facts, file contents, versions, or command outputs. If you have not checked, check.\n\n# Choosing tools\n- run_shell_command: run any shell command (counting, moving, archiving, running scripts, installing, git, system info). Downloads: `curl -fsSL -o <path> <url>` (create the folder first with `mkdir -p`).\n- read_file: read a file's contents. Pass file_path only, unless you need specific lines.\n- write_file: create a new file or fully rewrite a small file. Always give the full content.\n- replace: change part of an existing file. old_string must match the file exactly, including whitespace; read the file first.\n- list_directory: list a folder. glob: find files by name pattern (e.g. `**/*.py`). grep_search: find text inside files.\n- google_web_search: anything current or unknown to you (latest versions, news, prices, documentation). Then use web_fetch on a result URL if you need details.\n- web_fetch: read a web page. Put the full URL in the prompt, e.g. \"Get the main heading of https://example.com\".\n\n# Safety\n- Do not delete files or run destructive commands (rm -rf, git reset --hard, dropping data) unless the user explicitly asked for exactly that.\n- Stay inside the current project folder unless the user names another path.\n\n---\n\n<loaded_context>\n<global_context>\n--- Context from: ../../../../../../home/yamin/.gemini/GEMINI.md ---\n## Gemini Added Memories\n--- End of Context from: ../../../../../../home/yamin/.gemini/GEMINI.md ---\n</global_context>\n</loaded_context>"
+  },
+  {
+   "role": "user",
+   "content": "<session_context>\nThis is the Gemini CLI. We are setting up the context for our chat.\nToday's date is Saturday, October 31, 2026 (formatted according to the user's locale).\nMy operating system is: linux\nThe project's temporary directory is: /home/yamin/.gemini/tmp/work2\n- **Workspace Directories:**\n  - /tmp/claude-1000/-home-yamin/1f5a50d0-2151-4781-b098-a33d0d86b3b9/scratchpad/work2\n- **Directory Structure:**\n\nShowing up to 200 items (files + folders).\n\n/tmp/claude-1000/-home-yamin/1f5a50d0-2151-4781-b098-a33d0d86b3b9/scratchpad/work2/\n\u251c\u2500\u2500\u2500out.txt\n\u2514\u2500\u2500\u2500.gemini/\n    \u2514\u2500\u2500\u2500settings.json\n\n\n</session_context>"
+  },
+  {
+   "role": "user",
+   "content": "hi"
+  }
+ ],
+ "options": {
+  "num_ctx": 16384,
+  "temperature": 1,
+  "top_p": 0.95
+ },
+ "tools": [
+  {
+   "type": "function",
+   "function": {
+    "name": "list_directory",
+    "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "dir_path": {
+       "description": "The path to the directory to list",
+       "type": "string"
+      },
+      "ignore": {
+       "description": "List of glob patterns to ignore",
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      },
+      "file_filtering_options": {
+       "description": "Optional: Whether to respect ignore patterns from .gitignore or .geminiignore",
+       "type": "object",
+       "properties": {
+        "respect_git_ignore": {
+         "description": "Optional: Whether to respect .gitignore patterns when listing files. Only available in git repositories. Defaults to true.",
+         "type": "boolean"
+        },
+        "respect_gemini_ignore": {
+         "description": "Optional: Whether to respect .geminiignore patterns when listing files. Defaults to true.",
+         "type": "boolean"
+        }
+       }
+      }
+     },
+     "required": [
+      "dir_path"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "read_file",
+    "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'start_line' and 'end_line' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "file_path": {
+       "description": "The path to the file to read.",
+       "type": "string"
+      },
+      "start_line": {
+       "description": "Optional: The 1-based line number to start reading from.",
+       "type": "number"
+      },
+      "end_line": {
+       "description": "Optional: The 1-based line number to end reading at (inclusive).",
+       "type": "number"
+      }
+     },
+     "required": [
+      "file_path"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "grep_search",
+    "description": "Searches for a regular expression pattern within file contents. Max 100 matches.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "pattern": {
+       "description": "The regular expression (regex) pattern to search for within file contents (e.g., 'function\\s+myFunction', 'import\\s+\\{.*\\}\\s+from\\s+.*').",
+       "type": "string"
+      },
+      "dir_path": {
+       "description": "Optional: The absolute path to the directory to search within. If omitted, searches the current working directory.",
+       "type": "string"
+      },
+      "include_pattern": {
+       "description": "Optional: A glob pattern to filter which files are searched (e.g., '*.js', '*.{ts,tsx}', 'src/**'). If omitted, searches all files (respecting potential global ignores).",
+       "type": "string"
+      },
+      "exclude_pattern": {
+       "description": "Optional: A regular expression pattern to exclude from the search results. If a line matches both the pattern and the exclude_pattern, it will be omitted.",
+       "type": "string"
+      },
+      "names_only": {
+       "description": "Optional: If true, only the file paths of the matches will be returned, without the line content or line numbers. This is useful for gathering a list of files.",
+       "type": "boolean"
+      },
+      "max_matches_per_file": {
+       "description": "Optional: Maximum number of matches to return per file. Use this to prevent being overwhelmed by repetitive matches in large files.",
+       "type": "integer",
+       "minimum": 1
+      },
+      "total_max_matches": {
+       "description": "Optional: Maximum number of total matches to return. Use this to limit the overall size of the response. Defaults to 100 if omitted.",
+       "type": "integer",
+       "minimum": 1
+      }
+     },
+     "required": [
+      "pattern"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "glob",
+    "description": "Efficiently finds files matching specific glob patterns (e.g., `src/**/*.ts`, `**/*.md`), returning absolute paths sorted by modification time (newest first). Ideal for quickly locating files based on their name or path structure, especially in large codebases.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "pattern": {
+       "description": "The glob pattern to match against (e.g., '**/*.py', 'docs/*.md').",
+       "type": "string"
+      },
+      "dir_path": {
+       "description": "Optional: The absolute path to the directory to search within. If omitted, searches the root directory.",
+       "type": "string"
+      },
+      "case_sensitive": {
+       "description": "Optional: Whether the search should be case-sensitive. Defaults to false.",
+       "type": "boolean"
+      },
+      "respect_git_ignore": {
+       "description": "Optional: Whether to respect .gitignore patterns when finding files. Only available in git repositories. Defaults to true.",
+       "type": "boolean"
+      },
+      "respect_gemini_ignore": {
+       "description": "Optional: Whether to respect .geminiignore patterns when finding files. Defaults to true.",
+       "type": "boolean"
+      }
+     },
+     "required": [
+      "pattern"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "google_web_search",
+    "description": "Performs a web search using Google Search (via the Gemini API) and returns the results. This tool is useful for finding information on the internet based on a query.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "query": {
+       "type": "string",
+       "description": "The search query to find information on the web."
+      }
+     },
+     "required": [
+      "query"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "codebase_investigator",
+    "description": "The specialized tool for codebase analysis, architectural mapping, and understanding system-wide dependencies.\n    Invoke this tool for tasks like vague requests, bug root-cause analysis, system refactoring, comprehensive feature implementation or to answer questions about the codebase that require investigation.\n    It returns a structured report with key file paths, symbols, and actionable architectural insights.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "objective": {
+       "type": "string",
+       "description": "A comprehensive and detailed description of the user's ultimate goal.\n          You must include original user's objective as well as questions and any extra context and questions you may have."
+      }
+     },
+     "required": [
+      "objective"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "cli_help",
+    "description": "Specialized in answering questions about how users use you, (Gemini CLI): features, documentation, and current runtime configuration.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "question": {
+       "type": "string",
+       "description": "The specific question about Gemini CLI."
+      }
+     },
+     "required": [
+      "question"
+     ]
+    }
+   }
+  },
+  {
+   "type": "function",
+   "function": {
+    "name": "generalist",
+    "description": "A general-purpose AI agent with access to all tools. Highly recommended for tasks that are turn-intensive or involve processing large amounts of data. Use this to keep the main session history lean and efficient. Excellent for: batch refactoring/error fixing across multiple files, running commands with high-volume output, and speculative investigations.",
+    "parameters": {
+     "type": "object",
+     "properties": {
+      "request": {
+       "type": "string",
+       "description": "The task or question for the generalist agent."
+      }
+     },
+     "required": [
+      "request"
+     ]
+    }
+   }
+  }
+ ]
+}

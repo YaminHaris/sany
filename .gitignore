@@ -1,0 +1,44 @@
+# Python / Finetune artifacts
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+unsloth_compiled_cache/
+llama.cpp/
+out/
+data/
+results/
+*.gguf
+*.safetensors
+*.pt
+*.bin
+*.jsonl
+!finetune/capture/*.jsonl
+*.out
+*.log
+install.log
+
+# Node / CLI artifacts
+node_modules/
+bundle/
+dist/
+*.tsbuildinfo
+.eslintcache
+.genkit/
+.docker/
+.integration-tests/
+packages/*/coverage/
+packages/cli/src/generated/
+packages/core/src/generated/
+packages/devtools/src/_client-assets.ts
+packages/vscode-ide-companion/*.vsix
+packages/cli/download-ripgrep*/
+
+# Secrets & OS
+.env
+.env*
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+gha-creds-*.json

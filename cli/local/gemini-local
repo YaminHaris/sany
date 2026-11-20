@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Runs Gemini CLI against a local Ollama model, with a compact prompt and toolset.
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+export LOCAL_LLM_BASE_URL="${LOCAL_LLM_BASE_URL:-http://localhost:11434}"
+export LOCAL_LLM_MODEL="${LOCAL_LLM_MODEL:-qwen-pentest-v5}"
+export LOCAL_LLM_NUM_CTX="${LOCAL_LLM_NUM_CTX:-16384}"
+export GEMINI_SYSTEM_MD="${GEMINI_SYSTEM_MD:-$HERE/system.md}"
+export GEMINI_CLI_SYSTEM_SETTINGS_PATH="${GEMINI_CLI_SYSTEM_SETTINGS_PATH:-$HERE/settings.json}"
+exec node "$HERE/../bundle/gemini.js" "$@"

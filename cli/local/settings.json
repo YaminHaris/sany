@@ -1,0 +1,45 @@
+{
+  "model": {
+    "name": "gemini-2.5-flash"
+  },
+  "tools": {
+    "core": [
+      "run_shell_command",
+      "read_file",
+      "write_file",
+      "replace",
+      "list_directory",
+      "glob",
+      "grep_search",
+      "web_fetch",
+      "google_web_search"
+    ],
+    "useRipgrep": false
+  },
+  "experimental": {
+    "enableAgents": false,
+    "gemmaModelRouter": {
+      "enabled": false
+    }
+  },
+  "skills": {
+    "enabled": false
+  },
+  "agents": {
+    "overrides": {
+      "codebase_investigator": {
+        "enabled": false
+      },
+      "cli_help": {
+        "enabled": false
+      },
+      "generalist": {
+        "enabled": false
+      }
+    }
+  },
+  "general": {
+    "enableAutoUpdate": false,
+    "enableAutoUpdateNotification": false
+  }
+}
