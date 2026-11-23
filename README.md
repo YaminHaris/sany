@@ -49,6 +49,9 @@ Fine-tuning didn't just push accuracy from **70% → 100%**—it cut total bench
 * **`qwen-pentest-v4`:** Scored **60 / 60 (100%)** across all 4 targeted suites — General (`35/35`), Recon (`12/12`), Exploit (`8/8`), and Bug Bounty (`5/5`) — with **0 tool errors** across Recon, Exploit, and Bug Bounty.
 * **`qwen-pentest-v5` (120-Case Stratified Sample of 1,200-Task Benchmark, `run_1000_bench.py --stratified 5`):** Scored **100 / 120 (83.33%)** overall with **0 described-instead-of-acting failures** (Bug Bounty `5/5`, General `31/35`, Recon `10/12`, Explore `2/3`, Exploit `5/8`).
 
+> **Evaluation Methodology & Data Split:** The 4 targeted suites (`60/60`) serve as regression & capability checks covering the specific failure modes targeted during training. The **1,200-task benchmark** (`eval_cases_1000.py`, sampled via `--stratified 5` for 120 cases) tests procedurally parameterized unseen task instances (randomized ports, filenames, IPs, and payloads) to measure generalization.  
+> **Repository Note:** SANY is published as a consolidated monorepo combining `cli/` and `finetune/` from separate local development histories.
+
 ---
 
 ## How Everything Was Built (`finetune/` + `cli/`)
