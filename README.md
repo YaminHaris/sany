@@ -1,6 +1,14 @@
 # SANY — Local Agentic CLI & Fine-Tuned Qwen2.5-7B Pentest/Systems Model
 
+![Qwen2.5-7B](https://img.shields.io/badge/Model-Qwen2.5--7B--QLoRA-58a6ff?style=for-the-badge)
+![Pass Rate](https://img.shields.io/badge/Benchmark-83.33%25_(100%2F120)-3fb950?style=for-the-badge)
+![GPU](https://img.shields.io/badge/Trained_on-6GB_RTX_4050-a371f7?style=for-the-badge)
+
 **SANY** is a fully local, tool-calling AI terminal agent powered by a custom fine-tuned **Qwen2.5-7B-Instruct** model running via **Ollama**, paired with a patched TypeScript/Node **Gemini CLI** frontend.
+
+<p align="center">
+  <img src="assets/sany_demo.gif" alt="SANY QLoRA + DPO + GRPO Benchmark Progression" width="800"/>
+</p>
 
 ---
 
